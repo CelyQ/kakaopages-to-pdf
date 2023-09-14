@@ -23,14 +23,14 @@ export async function authenticate(page: Page): Promise<void> {
     throw new Error('Input not found');
   }
 
-  const email = process.env.KAKAO_USERNAME;
+  const username = process.env.KAKAO_USERNAME;
   const password = process.env.KAKAO_PASSWORD;
 
-  if (!email || !password) {
+  if (!username || !password) {
     throw new Error('KAKAO_USERNAME or KAKAO_PASSWORD environment variable not found');
   }
 
-  await usernameInput.type(email);
+  await usernameInput.type(username);
   await passwordInput.type(password);
 
   await submitButton.click();

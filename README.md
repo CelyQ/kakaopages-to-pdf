@@ -23,6 +23,12 @@ This is a simple script that accesses the kakaopages website and downloads all t
 ### Prerequisites
 
 - [bun](https://bun.sh/docs/installation)
+- create a `.env` file with the following variables:
+
+```bash
+KAKAOPAGES_USERNAME=your_email
+KAKAOPAGES_PASSWORD=your_password
+```
 
 ### To install dependencies
 
