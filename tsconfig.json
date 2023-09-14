@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es2021",
         "module": "esnext",
-        "rootDir": "./",
+        "rootDir": "./src",
         "moduleResolution": "nodenext",
         "resolveJsonModule": true,
         "outDir": "./dist",

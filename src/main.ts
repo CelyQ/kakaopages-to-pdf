@@ -14,7 +14,7 @@ const link = args[0]
 let chapterName: string
 ;(async () => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args: ['--no-sandbox', '--disable-dev-shm-usage'],
         ignoreDefaultArgs: ['--disable-extensions'],
     })
