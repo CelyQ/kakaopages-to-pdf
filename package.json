@@ -1,26 +1,24 @@
 {
-    "name": "kakao-scrapper",
-    "bin": "./dist/main.js",
-    "type": "module",
-    "scripts": {
-        "start": "yarn build && node ./dist/main.js",
-        "build": "tsc -p ."
-    },
-    "devDependencies": {
-        "prettier": "2.4.1",
-        "tsc": "^2.0.3",
-        "typescript": "^4.4.3"
-    },
-    "dependencies": {
-        "images-to-pdf": "^1.0.3",
-        "puppeteer": "^10.2.0"
-    },
-    "pkg": {
-        "assets": [],
-        "targets": [
-            "node14-win-x64"
-        ],
-        "outputPath": "dist"
-    },
-    "license": "UNLICENSED"
+  "name": "kakaopages-to-pdf",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "build": "bun build --compile src/index.ts --outfile=out/kakaopages-to-pdf",
+    "dev": "bun run src/index.ts"
+  },
+  "prettier": "@vercel/style-guide/prettier",
+  "dependencies": {
+    "puppeteer": "^21.1.1"
+  },
+  "devDependencies": {
+    "@vercel/style-guide": "^5.0.1",
+    "bun-types": "latest",
+    "eslint": "^8.49.0",
+    "eslint-config-standard": "^17.1.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
 }
