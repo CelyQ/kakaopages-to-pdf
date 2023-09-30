@@ -5,7 +5,7 @@ export class TabQueue {
 
   constructor(private maxConcurrentTabs: number = MAX_CONCURRENT_TABS) {}
 
-  public async run(): Promise<void> {
+  public async run(cb?: () => Promise<void> | void): Promise<void> {
     const promises: Promise<void>[] = [];
 
     for (let i = 0; i < this.maxConcurrentTabs; i++) {
@@ -16,6 +16,8 @@ export class TabQueue {
     }
 
     await Promise.all(promises);
+    if (!cb) return;
+    await cb();
   }
 
   public enqueue(fn: () => Promise<void>): void {

@@ -3,20 +3,21 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
-    "build": "bun build --compile src/index.ts --outfile=out/kakaopages-to-pdf",
-    "dev": "bun run src/index.ts"
+    "build": "bun build --minify --target=bun ./src/index.ts --outdir=build --outfile=index.js",
+    "build-binary": "bun build --compile src/index.ts --outfile=out/kp2pdf",
+    "dev": "bun run src/index.ts",
+    "postinstall": "bunx @puppeteer/browsers install chrome@stable --path $HOME/.cache/puppeteer"
   },
   "prettier": "@vercel/style-guide/prettier",
   "dependencies": {
-    "puppeteer": "^21.1.1"
+    "puppeteer": "21.3.6"
   },
   "devDependencies": {
     "@vercel/style-guide": "^5.0.1",
     "bun-types": "latest",
     "eslint": "^8.49.0",
     "eslint-config-standard": "^17.1.0",
-    "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
+    "prettier": "^3.0.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
