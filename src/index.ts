@@ -1,7 +1,9 @@
-import { mkdir } from 'node:fs/promises';
+import { readdir, mkdir, rm, exists, unlink, lstat } from 'node:fs/promises';
+import path from 'node:path';
 import Bun from 'bun';
 import { launch } from 'puppeteer';
 import type { PuppeteerLaunchOptions } from 'puppeteer';
+import { imagesToPdf } from './images-to-pdf';
 import { authenticate } from './auth';
 import { getWebtoons } from './get-webtoons';
 import { getEpisodes } from './get-episodes';
@@ -9,11 +11,9 @@ import { revealAllEpisodes } from './reveal-all-episodes';
 import { TabQueue } from './tab-queue';
 
 const launchOptions: PuppeteerLaunchOptions = {
-  args: ['--no-sandbox', '--disable-dev-shm-usage', '--start-maximized'],
-  ignoreDefaultArgs: ['--disable-extensions'],
-  defaultViewport: null,
   headless: 'new',
-  // headless: false,
+  ignoreDefaultArgs: ['--disable-extensions'],
+  args: ['--no-sandbox', '--disable-dev-shm-usage', '--start-maximized'],
 };
 
 const browser = await launch(launchOptions);
@@ -26,7 +26,7 @@ await authenticate(entryPage);
 const webtoons = await getWebtoons(entryPage);
 await entryPage.close();
 
-const imageTabQueue = new TabQueue(10);
+const imageTabQueue = new TabQueue(15);
 const episodesTabQueue = new TabQueue(1);
 
 const collectEpisodesAndEnqueuePromises = webtoons.map(async (webtoon) => {
@@ -69,7 +69,7 @@ const collectEpisodesAndEnqueuePromises = webtoons.map(async (webtoon) => {
           });
 
           if (response) {
-            const outputDir = `.temp/${webtoon.title}/${episode.title}`;
+            const outputDir = `output/${webtoon.title}/${episode.title}`;
             const outputDirExists = await Bun.file(outputDir).exists();
 
             if (!outputDirExists) {
@@ -102,3 +102,63 @@ while (episodesTabQueue.length > 0) {
 }
 
 await browser.close();
+
+await Promise.all(
+  webtoons.map(async (webtoon) => {
+    const outputDir = `output/${webtoon.title}`;
+    const outputDirExists = await exists(outputDir);
+
+    if (!outputDirExists) return;
+
+    const episodes = (await readdir(outputDir))
+      .filter((e) => e !== '.DS_Store')
+      .filter((e) => !e.endsWith('.pdf'));
+
+    const createPdfPromises = episodes.map(async (episode) => {
+      const episodeDir = `${outputDir}/${episode}`;
+
+      const images = await readdir(episodeDir);
+      const imageFilePaths = images
+        .map((filename) => {
+          return `${outputDir}/${episode}/${filename}`;
+        })
+        .filter((filename) => filename.endsWith('.png'))
+        .sort((a, b) => {
+          const aNum = Number(a.split('/').pop()?.split('.')[0]);
+          const bNum = Number(b.split('/').pop()?.split('.')[0]);
+
+          return aNum - bNum;
+        });
+
+      const filename = `${outputDir}/${episode}.pdf`;
+      imagesToPdf(imageFilePaths, filename);
+    });
+
+    const removeFolderWithImagesPromises = episodes.map(async (e) => {
+      const folder = path.join(__dirname, '..', outputDir, e);
+      const folderExists = await exists(folder);
+
+      if (!folderExists) return;
+
+      const files = await readdir(folder);
+
+      try {
+        const removeFilePromises = files.map(async (file) => {
+          const filePath = path.join(folder, file);
+          const fileExists = await exists(filePath);
+
+          if (!fileExists) return;
+
+          return unlink(filePath);
+        });
+        await Promise.allSettled(removeFilePromises);
+        await rm(folder, { recursive: true, force: true });
+      } catch {
+        // ignore
+      }
+    });
+
+    await Promise.all(createPdfPromises);
+    return Promise.all(removeFolderWithImagesPromises);
+  }),
+);
