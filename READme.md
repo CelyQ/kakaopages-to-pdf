@@ -16,6 +16,8 @@ This is a simple script that downloads the chapter you provided as images and co
 There is a "bun" [branch](https://github.com/CelyQ/kakaopages-to-pdf/tree/bun) which is a work in progress.
 It is a rewrite using [bun](https://bun.sh/). It is going to be a tool to sync all of your webtoons to your local machine.
 
+*temporarily on pause due to bun's error when building the project with puppeteer*
+
 ### Prerequisites
 
 - node v14
